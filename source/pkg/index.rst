@@ -8,3 +8,7 @@
     :numbered:
 
     color
+    crypto
+    dao-mysql
+    encoding
+    exception
