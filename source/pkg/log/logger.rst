@@ -7,7 +7,7 @@ logger
 .. contents:: 目录
 
 统一log级别、接口
---------------
+-----------------------
 
 LEVEL::
 
@@ -111,3 +111,29 @@ AsyncLogRoutine::
 ::
 
     func NewAsyncLogger(logger ILogger, ach *AsyncLogRoutineCh) *asyncLogger
+
+Demo::
+
+    import (
+        "andals/gobox/log"
+        "andals/gobox/log/buffer"
+        "andals/gobox/log/writer"
+    )
+
+	fw, _ := writer.NewFileWriter("/tmp/test_async_web_logger.log")
+	bw := buffer.NewBuffer(fw, 1024)
+	sl, _ := log.NewSimpleLogger(bw, log.LEVEL_INFO, log.NewWebFormater([]byte("async_web")))
+	logger := log.NewAsyncLogger(sl, log.NewAsyncLogRoutine(10))
+
+	msg := []byte("test async web logger")
+
+	logger.Debug(msg)
+	logger.Info(msg)
+	logger.Notice(msg)
+	logger.Warning(msg)
+	logger.Error(msg)
+	logger.Critical(msg)
+	logger.Alert(msg)
+	logger.Emergency(msg)
+
+	logger.Free()

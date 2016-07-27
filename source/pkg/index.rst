@@ -8,8 +8,10 @@
 
     color
     crypto
-    dao/index
     encoding
     exception
+    dao/index
     http/index
     log/index
+    misc
+    shardmap
