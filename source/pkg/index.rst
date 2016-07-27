@@ -12,3 +12,4 @@
     encoding
     exception
     http/index
+    log/index
