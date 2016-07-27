@@ -1,4 +1,4 @@
-.. _dao-mysql:
+.. _mysql:
 
 mysql操作
 ==========

@@ -6,11 +6,14 @@
 Welcome to gobox's documentation!
 =====================================
 
+gobox是一个轻量的golang应用框架，里面包含了我们在项目实践中总结出的各个独立组件和一些最佳实践。
+
 Contents:
 
 .. toctree::
    :maxdepth: 2
    :glob:
+   :titlesonly:
 
    pkg/index
 

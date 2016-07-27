@@ -5,10 +5,10 @@
 
 .. toctree::
     :maxdepth: 2
-    :numbered:
 
     color
     crypto
-    dao-mysql
+    dao/index
     encoding
     exception
+    http/index
