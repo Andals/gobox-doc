@@ -13,5 +13,7 @@
     dao/index
     http/index
     log/index
-    misc
     shardmap
+    simplecache
+    shell
+    misc
