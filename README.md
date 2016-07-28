@@ -1,2 +1,3 @@
 # gobox-doc
-document of gobox
+
+[doc](http://gobox.readthedocs.io/en/latest/)
