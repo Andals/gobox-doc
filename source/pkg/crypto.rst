@@ -45,6 +45,12 @@ PKCS5Padding
 
 AES对称加解密（CBC模式）
 ^^^^^^^^^^^^^^^^^^^^^^^^^
+AesCBCCrypter::
+
+    func NewAesCBCCrypter(key []byte, iv []byte) (*AesCBCCrypter, error)  //key和iv的规则下面的Demo中有说明。
+    func (this *AesCBCCrypter) SetPadding(padding PaddingInterface)       //默认的padding方法使用PKCS5Padding，如果需要修改时可以调用这个方法。
+    func (this *AesCBCCrypter) Encrypt(data []byte) []byte
+    func (this *AesCBCCrypter) Decrypt(crypted []byte) []byte
 
 Demo:: 
 
