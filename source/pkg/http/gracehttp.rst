@@ -1,6 +1,6 @@
 .. _gracehttp:
 
 支持平滑重启的http-server
-============
+===============================
 
-`gracehttp <https://github.com/tabalt/gracehttp>`_
+`平滑重启的http-server <https://github.com/tabalt/gracehttp>`_
