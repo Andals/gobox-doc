@@ -31,5 +31,7 @@ struct::
         msg   string
     }
 
-    func Base64Encode(data []byte) []byte
-    func Base64Decode(coded []byte) []byte
+    func New(errno int, msg string) *Exception
+    func (this *Exception) Errno() int
+    func (this *Exception) Msg() string
+    func (this *Exception) Error() string
