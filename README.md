@@ -1,3 +1,3 @@
 # gobox-doc
 
-[doc](http://gobox.readthedocs.io/en/latest/)
+[doc](http://gobox.readthedocs.io)
