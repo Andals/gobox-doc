@@ -62,7 +62,7 @@ Demo::
 	iv := crypto.Md5([]byte("andals"))[:crypto.AES_BLOCK_SIZE]   //The length of iv must be the same as the Block's block size
 	data := []byte("abc")
 
-	acc, _ := NewAesCBCCrypter(key, iv)
+	acc, _ := crypto.NewAesCBCCrypter(key, iv)
 	crypted := acc.Encrypt(data)
 	d := acc.Decrypt(crypted)
 
