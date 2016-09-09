@@ -54,6 +54,13 @@ ActionFunc
 
     type ActionFunc func(context *Context, args []string)
 
+JumpFunc
+^^^^^^^^^^^^^
+
+::
+
+    type JumpFunc func(context *Context, args ...interface{})
+
 使用
 --------
 
@@ -88,6 +95,27 @@ import
     func (this *Controller) AddAfterAction(pattern string, af ActionFunc)
 
 查找对应actionFunc时，均使用request_uri通过正则匹配进行查找
+
+设置action找不到时如何做
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+::
+
+    func (this *Controller) SetMissActionFunc(jf JumpFunc)
+
+直接返回302重定向
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+::
+
+    func Redirect302(url string)
+
+中断action的执行，跳转到指定方法执行
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+::
+
+    func LongJump(jf JumpFunc, args ...interface{})
 
 Demo
 ---------

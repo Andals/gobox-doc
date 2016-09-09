@@ -1,3 +1,4 @@
-build/*
-
 *.sw*
+
+build/*
+conf/http/*_http.conf.ngx
