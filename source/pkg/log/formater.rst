@@ -45,13 +45,13 @@ SimpleFormater::
     type SimpleFormater struct {
     }
 
-此结构添加level信息，并添加换行。
+此结构添加level和时间信息，并添加换行。
 
 web格式化
 **********
 
 ::
 
-    func NewWebFormater(logId []byte) *WebFormater
+    func NewWebFormater(logId, ip []byte) *WebFormater
 
-此结构格式化web请求时记录的log，添加logId、请求时间及换行符。
+此结构格式化web请求时记录的log，添加logId、ip、请求时间及换行符。

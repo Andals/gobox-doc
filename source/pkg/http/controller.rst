@@ -78,8 +78,8 @@ import
 
 ::
 
-    func (this *Controller) AddExactMatchAction(pattern string, af ActionFunc)  //request_uri严格匹配
-    func (this *Controller) AddRegexMatchAction(pattern string, af ActionFunc)  //request_uri正则匹配
+        func (this *Controller) AddExactMatchAction(key string, f ActionFunc) *Controller  //request_uri严格匹配
+        func (this *Controller) AddRegexMatchAction(pattern string, f ActionFunc) *Controller  //request_uri正则匹配
 
 路由查找action说明：
 
@@ -102,6 +102,20 @@ import
 ::
 
     func (this *Controller) SetMissActionFunc(jf JumpFunc)
+
+添加destructFunc
+^^^^^^^^^^^^^^^^^^^
+
+destructFunc会在dispatch后执行，作为资源销毁、释放阶段，每个请求中会造成内存泄漏的临时资源可以在这里释放。
+
+和afterAction的不同如下：
+
+1. 例如redirect302这种跳过dispatch阶段的行为，依旧可以通过这个阶段释放资源。
+#. 无法在这个阶段修改response。
+
+::
+
+    func (this *Controller) AddDestructFunc(pattern string, f DestructFunc) *Controller
 
 直接返回302重定向
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
