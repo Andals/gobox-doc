@@ -17,3 +17,4 @@
     simplecache
     shell
     misc
+    task
