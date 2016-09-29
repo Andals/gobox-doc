@@ -18,3 +18,5 @@
     shell
     misc
     task
+    ipquery
+    pidfile
