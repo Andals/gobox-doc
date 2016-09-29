@@ -53,3 +53,11 @@ import::
 ::
 
     func Rsync(host string, sou string, dst string, excludeFrom string, sshUser string, timeout int) *ShellResult
+
+从shell中获取参数列表
+****************
+
+::
+
+    func GetParamsFromShell(shell string, keyMap map[string]string) map[string]string
+
