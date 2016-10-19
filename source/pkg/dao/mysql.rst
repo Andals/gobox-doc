@@ -143,21 +143,19 @@ SimpleQueryBuilder
 
 示例::
 
-    this.Sqb.
-        Insert(tableName, colNames...).
+    sqb:=new(SimpleQueryBuilder)
+
+    sqb.Insert(tableName, colNames...).
         Values(colsValues...)
 
-    this.Sqb.
-        Delete(tableName).
+    sqb.Delete(tableName).
         WhereConditionAnd(NewColQueryItem("id", COND_EQUAL, id))
 
-    this.Sqb.
-        Update(tableName).
+    sqb.Update(tableName).
         Set(setItems...).
         WhereConditionAnd(NewColQueryItem("id", COND_EQUAL, id))
 
-    this.Sqb.
-        Select(what, tableName).
+    sqb.Select(what, tableName).
         WhereConditionAnd(NewColQueryItem("id", COND_EQUAL, id))
 
 常用where条件支持::
