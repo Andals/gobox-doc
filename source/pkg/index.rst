@@ -20,3 +20,4 @@
     task
     ipquery
     pidfile
+    redis
