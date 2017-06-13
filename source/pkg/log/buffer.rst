@@ -2,7 +2,7 @@
 
 buffer
 =============
-这个包实现对writer添加buffer，提升效率。
+实现对writer添加buffer，提升效率。
 
 buffer是writer的装饰，所以依旧是IWriter。
 
@@ -14,15 +14,16 @@ buffer是writer的装饰，所以依旧是IWriter。
 import::
 
     import (
-        "andals/gobox/log/buffer"
+        "andals/gobox/log/writer"
     )
 
 demo::
 
     import (
-        "andals/gobox/log/buffer"
         "andals/gobox/log/writer"
     )
+
+    writer.InitBufferAutoFlushRoutine(1024, time.Second*7)
 
 	path := "/tmp/test_buffer.log"
 	bufsize := 4096
@@ -34,4 +35,21 @@ demo::
 	time.Sleep(time.Second * 5)
 	bw.Free()
 
+    writer.FreeBuffers()
+
+特别注意
+----------
+
 本buffer会自动启动一个goroutine，在后台自动定时将buffer中的信息刷到对应的write中调用Write方法。
+
+1. 使用buffer前，一定要先进行初始化
+
+调用::
+
+    func InitBufferAutoFlushRoutine(maxBufNum int, timeInterval time.Duration)
+
+2. 程序结束前，一定要释放所有buffer，这样才能不丢失log。
+
+调用::
+
+    func FreeBuffers()

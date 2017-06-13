@@ -83,27 +83,16 @@ Demo::
 
 如果不想执行log操作时被阻塞，可以使用改对象，该对象会把记录log的操作放到指定的goroutine中去做。
 
+实测使用异步logger对性能又极大提升。
+
 异步logger对象是对ILogger的装饰，所以本质上还是ILogger。
-
-重要数据结构
-***************
-
-AsyncLogRoutine::
-
-    type AsyncLogRoutineCh struct {
-        msgCh   chan *asyncMsg
-        flushCh chan ILogger
-        freeCh  chan int
-    }
-
-使用者需要根据实际情况自行启动异步goroutine，这个结构体在用于异步logger和goroutine的通信。
 
 启动异步goroutine
 *********************
 
-::
+这个一定要先启动::
 
-    func NewAsyncLogRoutine(queueLen int) *AsyncLogRoutineCh
+    func InitAsyncLogRoutine(msgQueueLen int)
 
 获得异步logger
 **********************
@@ -112,18 +101,31 @@ AsyncLogRoutine::
 
     func NewAsyncLogger(logger ILogger, ach *AsyncLogRoutineCh) *asyncLogger
 
-Demo::
+释放异步logger
+**********************
+
+这个要在程序退出前做，这样避免log丢失::
+
+    func FreeAsyncLogRoutine()
+
+
+Demo
+*************
+
+::
 
     import (
         "andals/gobox/log"
-        "andals/gobox/log/buffer"
         "andals/gobox/log/writer"
     )
 
+    log.InitAsyncLogRoutine(4096)
+    defer log.FreeAsyncLogRoutine()
+
 	fw, _ := writer.NewFileWriter("/tmp/test_async_web_logger.log")
-	bw := buffer.NewBuffer(fw, 1024)
+	bw := writer.NewBuffer(fw, 1024)
 	sl, _ := log.NewSimpleLogger(bw, log.LEVEL_INFO, log.NewWebFormater([]byte("async_web")))
-	logger := log.NewAsyncLogger(sl, log.NewAsyncLogRoutine(10))
+	logger := log.NewAsyncLogger(sl)
 
 	msg := []byte("test async web logger")
 
