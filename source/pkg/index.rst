@@ -8,16 +8,17 @@
 
     color
     crypto
+    mysql
     encoding
     exception
-    dao/index
     http/index
+    inotify
     log/index
+    misc
+    pidfile
+    pool
+    redis
     shardmap
     simplecache
     shell
-    misc
     task
-    ipquery
-    pidfile
-    redis

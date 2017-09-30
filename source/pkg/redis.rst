@@ -1,6 +1,6 @@
 .. _redis:
 
-redis
+Redis
 ==============
 
 .. contents:: 目录
@@ -9,91 +9,149 @@ redis
 ------
 这个包用于执行redis操作
 
-重要数据结构
----------------
+driver使用了 `redigo <https://github.com/garyburd/redigo>`_
 
-字符串数据结果::
+用法
+-----
 
-    type StringResult struct {
-        Value string
-        Err   error
+import
+^^^^^^^^^^
+示例::
+
+    import (
+        "andals/gobox/redis"
+    )
+
+Config
+^^^^^^^^^^
+定义::
+
+    const (
+        DEFAULT_CONNECT_TIMEOUT = 10 * time.Second
+        DEFAULT_READ_TIMEOUT    = 10 * time.Second
+        DEFAULT_WRITE_TIMEOUT   = 10 * time.Second
+    )
+
+    type Config struct {
+        LogLevel int
+
+        Host string
+        Port string
+        Pass string
+
+        ConnectTimeout time.Duration
+        ReadTimeout    time.Duration
+        WriteTimeout   time.Duration
     }
 
-hash数据结果::
+    func NewConfig(host, port, pass string) *Config {
+        return &Config{
+            LogLevel: golog.LEVEL_INFO,
 
-    type HashResult struct {
-        Value map[string]string
-        Err   error
+            Host: host,
+            Port: port,
+            Pass: pass,
+
+            ConnectTimeout: DEFAULT_CONNECT_TIMEOUT,
+            ReadTimeout:    DEFAULT_READ_TIMEOUT,
+            WriteTimeout:   DEFAULT_WRITE_TIMEOUT,
+        }
     }
 
-操作client接口，用户可以自行实现自己的client::
+使用NewConfig方法获得初始化结构::
 
-    type IClient interface {
-        SetLogger(logger log.ILogger)
-        Free()
+    func NewConfig(host, port, pass string) *Config
 
-        Expire(key, seconds string) error
-        Del(key string) error
+Client
+^^^^^^^^^
+这个对象用于直接操作redis，里面有一些基础操作方法和常用方法的封装::
 
-        //args：[EX seconds] [PX milliseconds] [NX|XX]
-        Set(key, value string, args ...string) error
-        Setex(key, seconds, value string) error
-        Get(key string) *StringResult
+    func NewClient(config *Config, logger golog.ILogger) (*Client, error)
 
-        Hset(key, field, value string) error
-        Hmset(key string, fieldValuePairs ...string) error
-        Hget(key, field string) *StringResult
-        Hgetall(key string) *HashResult
-        Hdel(key string, fields ...string) error
+基础读写方法
+.............
+
+立即执行redis命令::
+
+    func (this *Client) Do(cmd string, args ...interface{}) (*Reply, error)
+
+暂存执行操作，这些操作之后可以使用pipelining方式或事务方式执行::
+
+    func (this *Client) Send(cmd string, args ...interface{}) error
+
+Pipelining执行暂存的操作::
+
+    func (this *Client) ExecPipelining() ([]*Reply, error)
+
+开始事务::
+
+    func (this *Client) BeginTrans() error
+
+放弃事务::
+
+    func (this *Client) DiscardTrans() error
+
+执行事务::
+
+    func (this *Client) ExecTrans() ([]*Reply, error)
+
+Reply
+^^^^^^
+操作返回结果，需要自己调用对应方法将结果转换为指定类型的值::
+
+    func (this *Reply) Bool() (bool, error)
+    func (this *Reply) ByteSlices() ([][]byte, error)
+    func (this *Reply) Bytes() ([]byte, error)
+    func (this *Reply) Float64() (float64, error)
+    func (this *Reply) Int() (int, error)
+    func (this *Reply) Int64() (int64, error)
+    func (this *Reply) Int64Map() (map[string]int64, error)
+    func (this *Reply) Ints() ([]int, error)
+    func (this *Reply) Struct(s interface{}) error
+    func (this *Reply) String() (string, error)
+    func (this *Reply) StringMap() (map[string]string, error)
+    func (this *Reply) Strings() ([]string, error)
+    func (this *Reply) Uint64() (uint64, error)
+
+转换为结构体时，结构体字段定义示例::
+
+    Field int `redis:"myName"`
+
+Demo::
+
+    package main
+
+    import (
+        "andals/gobox/redis"
+
+        "fmt"
+    )
+
+    type Demo struct {
+        Id   int `redis:"id"`
+        Name string `redis:"name"`
     }
 
-由于redis协议基于字符串传输，这里并没有使用interface这种兼容数据结构，而是直接使用了string作为操作值和返回结果中的相关数据类型。
+    func main() {
+        config := &redis.Config{
+            Host: "127.0.0.1",
+            Port: "6379",
+            Pass: "123",
+        }
+        client, _ := redis.NewClient(config, nil)
 
-简单client实现
-------------------
+        client.Do("set", "a", 1)
+        reply, _ := client.Do("get", "a")
+        fmt.Println(reply.Int())
 
-这里是一个预制的client实现，可以满足基本操作需求。
-
-获得client::
-
-    func NewSimpleClient(network, addr, pass string, timeout time.Duration) (*simpleClient, error)
-
-注意
-**********
-
-简单client获取获取数据时，如果数据为空（对应key已过期或不存在），则返回的xxxResult为nil。
-
-例如::
-
-    sr := client.Get(key)
-    if sr == nil {
-        fmt.Println("key not exists")
+        client.Do("hmset", "h1", "id", 1, "name", "a")
+        reply, _ = client.Do("hgetall", "h1")
+        demo := new(Demo)
+        reply.Struct(demo)
+        fmt.Println(demo)
     }
 
-redis连接池
-----------------
+Output::
 
-实测使用连接池能极大提升性能。
-
-使用说明
-**************
-
-创建连接池::
-
-    func NewPool(clientTimeout time.Duration, size int, newClientFunc func() (IClient, error)) *Pool
-
-从连接池中获取client::
-
-    func (this *Pool) Get() (IClient, error) {
-
-将不用的client放回连接池::
-
-    func (this *Pool) Put(client IClient) error {
-
-特别说明
-***********
-
-#. 从连接池中获取client和将不用的client放回连接池中的行为都是非阻塞方式
-#. 获取client时，如果连接池中没有可用client，则会创建一个client，创建方法使用新建连接池时传入的newClientFunc
-#. 获取client时，如果得到的client已经过期，则会创建一个client，创建方法使用新建连接池时传入的newClientFunc，过期的client会被释放，执行client.Free()
-#. 将client放回连接池时，如果连接池已满，则会抛弃掉这个client，会执行client.Free()
+    1 <nil>
+    &{1 a}
